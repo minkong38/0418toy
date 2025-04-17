@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: shop-deploy
+  namespace: aws9d
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shop    # (1)Pod 작성시 이 부분(label -> app: web)이 포함되어야 함
+  template:   # 여기에서 부터 Pod 작성
+    metadata:
+      labels:
+        app: shop  # 반드시 (1) 과 동일해야 함
+    spec:
+      containers:
+        - name: aws9ctn-shop
+          image: luce9981/aws9:blue
+          resources:
+            requests:
+              cpu: "100m"
+            limits: 
+              cpu: "200m"
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: html
+          persistentVolumeClaim:
+            claimName: shop-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aws9-svc-shop
+  namespace: aws9d
+spec:
+  ports:
+  - name: aws9-port-shop
+    port: 80       # cluster-ip 의 포트 번호(type 없으면 기본은 cluster-ip )
+    protocol: TCP
+    targetPort: 80    # 컨테이너의 포트 
+  selector:
+    app: shop    # Pod 의 label 을 지정해 주어야 한다!!! 
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-deploy
+  namespace: aws9d
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blog    # (1)Pod 작성시 이 부분(label -> app: web)이 포함되어야 함
+  template:   # 여기에서 부터 Pod 작성
+    metadata:
+      labels:
+        app: blog  # 반드시 (1) 과 동일해야 함
+    spec:
+      containers:
+        - name: aws9ctn-blog
+          image: luce9981/aws9:green
+          resources:
+            requests:
+              cpu: "100m"
+            limits:
+              cpu: "200m"
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: html
+          persistentVolumeClaim:
+            claimName: blog-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aws9-svc-blog
+  namespace: aws9d
+spec:
+  ports:
+  - name: aws9-port-blog
+    port: 80       # cluster-ip 의 포트 번호
+    protocol: TCP
+    targetPort: 80    # 컨테이너의 포트
+  selector:
+    app: blog    # Pod 의 label 을 지정해 주어야 한다!!!
