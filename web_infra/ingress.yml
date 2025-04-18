@@ -16,7 +16,7 @@ spec:
         backend:
           service:
             name: aws9-svc-default
-            prot:
+            port:
               number: 80
       - path: "/shop(/|$)"   # www.aws9.pri/shop
         pathType: Prefix
@@ -37,5 +37,5 @@ spec:
         backend:
           service:
             name: aws9-svc-news
-            prot:
+            port:
               number: 80
