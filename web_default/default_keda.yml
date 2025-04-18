@@ -1,0 +1,17 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: default-keda
+  namespace: aws9d
+spec:
+  scaleTargetRef:
+    name: default-deploy
+  pollingInterval: 30
+  cooldownPeriod: 60
+  triggers:
+    - type: cron
+      metadata:
+        timezone: Asia/Seoul
+        start: "0 9 * * *"
+        end: "0 18 * * *"
+        desiredReplicas: "3"
